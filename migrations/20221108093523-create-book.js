@@ -36,7 +36,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       published_date: {
-        type: Sequelize.DATE
+        type: Sequelize.DATEONLY
       },
       rating: {
         type: Sequelize.INTEGER
