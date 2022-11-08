@@ -1,0 +1,19 @@
+{
+  "name": "book_store",
+  "version": "1.0.0",
+  "description": "Book directory to add, retrieve, update and delete books",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ismailbilly/book_store.git"
+  },
+  "author": "@ismailbilly and @walearo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ismailbilly/book_store/issues"
+  },
+  "homepage": "https://github.com/ismailbilly/book_store#readme"
+}
