@@ -3,11 +3,11 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Books', {
-      // id: {
-      //   allowNull: false,
-      //   autoIncrement: true,
-      //   type: Sequelize.INTEGER
-      // },
+      id: {
+        autoIncrement: true,
+        unique:true,
+        type: Sequelize.INTEGER
+      },
       book_id: {
         allowNull: false,
         primaryKey: true,
@@ -32,14 +32,14 @@ module.exports = {
       status: {
         type: Sequelize.STRING
       },
-      ISBN: {
+      isbn: {
         type: Sequelize.STRING
       },
       published_date: {
         type: Sequelize.DATEONLY
       },
       rating: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER //1-5
       },
       createdAt: {
         allowNull: false,

@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     pages:DataTypes.INTEGER,
     price: DataTypes.STRING,
     status: DataTypes.STRING,
-    ISBN: DataTypes.STRING,
+    isbn: DataTypes.STRING,
     published_date:DataTypes.DATEONLY,
     rating:DataTypes.INTEGER  
   }, {

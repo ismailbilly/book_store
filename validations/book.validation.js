@@ -8,6 +8,7 @@ const bookValidation = (data) => {
         isbn: Joi.string().min(10).required(),
         published_date: Joi.date().iso().required(),
         rating: Joi.number().required(),
+        status:Joi.string(),
         firstName: Joi.string().min(5).required(),
         lastName: Joi.string().required(),
         middleName: Joi.string().required(),
