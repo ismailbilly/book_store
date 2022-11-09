@@ -1,18 +1,19 @@
 const { Author, Book } = require('../models')
 const { v4: uuidv4 } = require('uuid')
 const { bookValidation } = require('../validations/book.validation')
+const { Op } = require("sequelize");
 
 const getAllBooks = (req, res) => {
     try {
         Book.findAll({
             attributes: ['title', 'pages', 'price', 'isbn', 'status', 'rating'] 
         })
-        .then((bookdata) => {
-            //if (bookdata.length == 0) throw new Error('No book found, DB is empty')
-            if (bookdata.length == 0) bookdata = 'No book found, DB is empty'
+        .then((booksdata) => {
+            //if (booksdata.length == 0) throw new Error('No book found, DB is empty') //rosh to help with error 
+            if (booksdata.length == 0) booksdata = 'No book found, DB is empty'
             res.status(200).send({
                 status: true,
-                message: bookdata
+                message: booksdata
             })
         })
         .catch((err)=>{
@@ -27,7 +28,73 @@ const getAllBooks = (req, res) => {
 }
 
 const findOneBook = (req, res) => {
+    const { title } = req.params
+    try {
+        Book.findAll({
+            where: {
+                title: {
+                  [Op.like]: `%${title}%`
+                }
+            },
+            attributes: ['title', 'pages', 'price', 'isbn', 'status', 'rating'] 
+        })
+        .then((bookdata) => {
+            if (bookdata.length == 0) bookdata = `No book with the title: ${title}`
+            res.status(200).send({
+                status: true,
+                message: bookdata
+            })
+        })
+        .catch((err) => {
+            throw new Error(err.message)
+        })
+    } catch (error) {
+        res.status(400).json({
+            status: false,
+            message: error.message
+        })
+    }
+}
 
+const findBooksByAuthor = (req, res) => {
+    const { firstname, lastname } = req.params
+    try {
+        Author.findAll({
+            where: {
+                firstName: firstname,
+                lastName: lastname
+            },
+            attributes: ['author_id']
+        })
+        .then((authorinfo) => {
+            if (authorinfo.length == 0) throw new error(`Author: ${firstname} ${lastname} does not exist`)
+            return Book.findAll({
+                where: {
+                    author_id: authorinfo[0].author_id
+                },
+                attributes: ['title', 'pages', 'price', 'isbn', 'status', 'rating']
+            })
+        })
+        .then((bookdata) => {
+            console.log('Author:'+ bookdata)
+            if (bookdata.length == 0) bookdata = `No book from Author: ${firstname} ${lastname}`
+            res.status(200).send({
+                status: true,
+                message: bookdata
+            })
+        })
+        .catch((err) => {
+            res.status(400).json({
+                status: false,
+                message: err.message
+            })
+        })
+    } catch (error) {
+        res.status(400).json({
+            status: false,
+            message: error.message
+        })
+    }
 }
 
 const uploadBook =(req,res)=>{
@@ -86,4 +153,4 @@ const uploadBook =(req,res)=>{
 }
 
 
-module.exports = {uploadBook, getAllBooks, findOneBook}
+module.exports = {uploadBook, getAllBooks, findOneBook, findBooksByAuthor}

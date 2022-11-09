@@ -1,10 +1,10 @@
 const express = require('express')
-const {uploadBook, getAllBooks, findOneBook} = require('../controllers/bookUpload.controller')
+const {uploadBook, getAllBooks, findOneBook, findBooksByAuthor} = require('../controllers/bookUpload.controller')
 const router = express.Router()
 
 router.get('/all-books', getAllBooks)
 router.get('/:title', findOneBook)
-// router.get('/:firstname/:lastname', findBooksByAuthor)
+router.get('/author/:firstname/:lastname', findBooksByAuthor)
 
 router.post('/upload', uploadBook)
 
