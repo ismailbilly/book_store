@@ -6,12 +6,12 @@ const {bookValidation}=require('../validations/book.validation')
 const uploadBook =(req,res)=>{
     const {error, value} =bookValidation(req.body)
         if (error != undefined) {
-            // res.status(400).json({
-            //     status: false,
-            //     message: error.details[0].message
+            res.status(400).json({
+                status: false,
+                message: error.details[0].message
            
-            // })
-            console.log(error)
+            })
+         
         }
     const {firstName,lastName,middleName,email,title,pages,price,status,isbn,published_date,rating} =req.body
         const author_id = uuidv4()
@@ -39,7 +39,7 @@ const uploadBook =(req,res)=>{
                 })
             })
             .then((resolve)=>{
-                console.log('Book upload successful')
+                res.send('Book upload successful')
             }).catch((error)=>{
                 res.status(400).json({
                     status: false,
