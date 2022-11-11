@@ -1,5 +1,5 @@
 const express = require('express')
-const {uploadBook, getAllBooks, findOneBook, findBooksByAuthor, deleteBook} = require('../controllers/bookUpload.controller')
+const { uploadBook, getAllBooks, findOneBook, findBooksByAuthor, deleteBook, updateBook } = require('../controllers/bookUpload.controller')
 const router = express.Router()
 
 router.get('/all-books', getAllBooks)
@@ -8,7 +8,7 @@ router.get('/author/:firstname/:lastname', findBooksByAuthor)
 
 router.post('/upload', uploadBook)
 
-// router.put('/update', updateBook)
+router.put('/update', updateBook)
 
 router.delete('/delete/:title', deleteBook)
 

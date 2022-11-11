@@ -67,7 +67,7 @@ const findBooksByAuthor = (req, res) => {
             attributes: ['author_id']
         })
         .then((authorinfo) => {
-            if (authorinfo.length == 0) throw new error(`Author: ${firstname} ${lastname} does not exist`)
+            if (authorinfo.length == 0) throw new Error(`Author: ${firstname} ${lastname} does not exist`)
             return Book.findAll({
                 where: {
                     author_id: authorinfo[0].author_id
@@ -181,4 +181,42 @@ const deleteBook=((req,res)=>{
     })
    } 
 })
-module.exports = {uploadBook, getAllBooks, findOneBook, findBooksByAuthor, deleteBook}
+
+const updateBook = async (req, res) => {
+    const { error, value } = updateValidation(req.body)
+
+    if (error != undefined) {
+        throw new Error(error.details[0].message)
+    } else {
+        const { book_id } = req.params
+        const { title, pages, price, status, isbn, rating } = req.body
+        
+        try {
+            await Book.update({
+                title: title,
+                pages: pages,
+                price: price,
+                status: status,
+                isbn: isbn,
+                rating: rating
+            },
+            { where: { book_id: book_id } })
+
+            res.status(200).send({
+                status: true,
+                message: 'book details updated successfully'
+            })
+
+        } catch (err) {
+            res.status(400).json({
+                status: false,
+                message: err.message || "Some error occurred"
+            })
+        }
+    }
+}
+
+module.exports = { 
+    uploadBook, getAllBooks, findOneBook,
+    findBooksByAuthor, deleteBook, updateBook 
+}
