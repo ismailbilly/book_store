@@ -9,8 +9,7 @@ const getAllBooks = (req, res) => {
             attributes: ['title', 'pages', 'price', 'isbn', 'status', 'rating'] 
         })
         .then((booksdata) => {
-            //if (booksdata.length == 0) throw new Error('No book found, DB is empty') //rosh to help with error 
-            if (booksdata.length == 0) booksdata = 'No book found, DB is empty'
+            if (booksdata.length == 0) throw new Error('No book found, DB is empty')
             res.status(200).send({
                 status: true,
                 message: booksdata
@@ -39,7 +38,7 @@ const findOneBook = (req, res) => {
             attributes: ['title', 'pages', 'price', 'isbn', 'status', 'rating'] 
         })
         .then((bookdata) => {
-            if (bookdata.length == 0) bookdata = `No book with the title: ${title}`
+            if (bookdata.length == 0) throw new Error(`No book with the title: ${title}`)
             res.status(200).send({
                 status: true,
                 message: bookdata
@@ -76,8 +75,7 @@ const findBooksByAuthor = (req, res) => {
             })
         })
         .then((bookdata) => {
-            console.log('Author:'+ bookdata)
-            if (bookdata.length == 0) bookdata = `No book from Author: ${firstname} ${lastname}`
+            if (bookdata.length == 0) throw new Error(`No book from Author: ${firstname} ${lastname}`)
             res.status(200).send({
                 status: true,
                 message: bookdata
