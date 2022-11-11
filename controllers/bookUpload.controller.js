@@ -2,6 +2,7 @@ const { Author, Book } = require('../models')
 const { v4: uuidv4 } = require('uuid')
 const { bookValidation } = require('../validations/book.validation')
 const { Op } = require("sequelize");
+// const { UPSERT } = require('sequelize/types/query-types');
 
 const getAllBooks = (req, res) => {
     try {
@@ -31,7 +32,7 @@ const findOneBook = (req, res) => {
     try {
         Book.findAll({
             where: {
-                title: {
+                 title: {
                   [Op.like]: `%${title}%`
                 }
             },
@@ -98,26 +99,33 @@ const findBooksByAuthor = (req, res) => {
 const uploadBook =(req,res)=>{
     const {error, value} =bookValidation(req.body)
         if (error != undefined) {
-            // res.status(400).json({
-            //     status: false,
-            //     message: error.details[0].message
-           
-            // })
-            console.log(error)
-        }
+            
+        res.status(400).json({
+            status: false,
+            message: error.details[0].message
+        })
+    }else{
     const {firstName,lastName,middleName,email,title,pages,price,status,isbn,published_date,rating} =req.body
         const author_id = uuidv4()
         const book_id = uuidv4()
     try {
-        
-            Author.create({
+        Book.findAll({
+            where:{
+                title:title
+            },
+            attributes:['title', 'pages', 'price', 'isbn', 'status', 'rating'] 
+        })
+        .then((data)=>{
+            if(data.length > 0) throw new Error('Book exists')
+             Author.create({
                 author_id: author_id,
                 firstName: firstName,
                 lastName: lastName,
                 middleName: middleName,
                 email: email
-            })
-            .then(resolve=>{
+             })
+        })
+            .then((resolve)=>{
                 Book.create({
                     book_id: book_id,
                     author_id: author_id,
@@ -131,7 +139,7 @@ const uploadBook =(req,res)=>{
                 })
             })
             .then((resolve)=>{
-                console.log('Book upload successful')
+                res.send('Book upload successful')
             }).catch((error)=>{
                 res.status(400).json({
                     status: false,
@@ -149,6 +157,28 @@ const uploadBook =(req,res)=>{
         
     }
 }
+}
 
-
-module.exports = {uploadBook, getAllBooks, findOneBook, findBooksByAuthor}
+const deleteBook=((req,res)=>{
+    const {title}= req.params
+   try {
+            Book.destroy({
+                where:{
+                    title:title
+                }
+            }) .then((resolve)=>{
+                res.send('Book deleted successful')
+            }).catch((error)=>{
+                res.status(400).json({
+                    status: false,
+                    message: error.message || "Some error occurred"
+                })
+            })    
+   } catch (error) {
+        res.status(400).json({
+            status: false,
+            message: error.message || "Some error occurred"
+    })
+   } 
+})
+module.exports = {uploadBook, getAllBooks, findOneBook, findBooksByAuthor, deleteBook}
