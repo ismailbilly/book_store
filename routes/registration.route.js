@@ -8,7 +8,7 @@ router.get('/author/:firstname/:lastname', findBooksByAuthor)
 
 router.post('/upload', uploadBook)
 
-router.put('/update', updateBook)
+router.put('/update/:book_id', updateBook)
 
 router.delete('/delete/:title', deleteBook)
 

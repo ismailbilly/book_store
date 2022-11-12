@@ -2,6 +2,7 @@ const { Author, Book } = require('../models')
 const { v4: uuidv4 } = require('uuid')
 const { bookValidation } = require('../validations/book.validation')
 const { Op } = require("sequelize");
+const { updateValidation }  = require('../validations/update.validation')
 // const { UPSERT } = require('sequelize/types/query-types');
 
 const getAllBooks = (req, res) => {
@@ -240,13 +241,10 @@ const updateBook = async (req, res) => {
         } catch (err) {
             res.status(400).json({
                 status: false,
-                message: err.message || "Some error occurred"
+                message: err.message
             })
         }
     }
 }
 
-module.exports = { 
-    uploadBook, getAllBooks, findOneBook,
-    findBooksByAuthor, deleteBook, updateBook 
-}
+module.exports = { uploadBook, getAllBooks, findOneBook, findBooksByAuthor, deleteBook, updateBook }
