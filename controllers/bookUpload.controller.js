@@ -17,7 +17,10 @@ const getAllBooks = (req, res) => {
             })
         })
         .catch((err)=>{
-            throw new Error(err.message)
+            res.status(400).json({
+                status: false,
+                message: err.message
+            })
         })
     } catch (error) {
         res.status(400).json({
@@ -46,7 +49,10 @@ const findOneBook = (req, res) => {
             })
         })
         .catch((err) => {
-            throw new Error(err.message)
+            res.status(400).json({
+                status: false,
+                message: err.message
+            })
         })
     } catch (error) {
         res.status(400).json({
@@ -96,36 +102,61 @@ const findBooksByAuthor = (req, res) => {
     }
 }
 
-const uploadBook =(req,res)=>{
-    const {error, value} =bookValidation(req.body)
-        if (error != undefined) {
-            
+const uploadBook =(req, res) => {
+    const { error, value } = bookValidation(req.body)
+    
+    if (error != undefined) {
         res.status(400).json({
             status: false,
             message: error.details[0].message
         })
     }else{
-    const {firstName,lastName,middleName,email,title,pages,price,status,isbn,published_date,rating} =req.body
-        const author_id = uuidv4()
+
+        const { 
+            firstName, lastName, middleName, email, title, pages, 
+            price, status, isbn, published_date, rating 
+        } = req.body
+
         const book_id = uuidv4()
-    try {
-        Book.findAll({
-            where:{
-                title:title
-            },
-            attributes:['title', 'pages', 'price', 'isbn', 'status', 'rating'] 
-        })
-        .then((data)=>{
-            if(data.length > 0) throw new Error('Book exists')
-             Author.create({
-                author_id: author_id,
-                firstName: firstName,
-                lastName: lastName,
-                middleName: middleName,
-                email: email
-             })
-        })
-            .then((resolve)=>{
+        let author_id
+
+        try {
+            Book.findAll({   //check if book exist
+                where:{
+                    title: title,
+                    pages: pages,
+                    isbn: isbn
+                },
+                attributes:['title', 'isbn'] 
+            })
+            .then((data)=>{
+                if(data.length > 0) throw new Error(`Book already exists`) //if book is found throw error
+                
+                return Author.findAll({ //if book not found, check if author already exists
+                    where:{
+                        firstName:firstName,
+                        lastName:lastName,
+                        email:email
+                    },
+                    attributes:['author_id'] 
+                })
+            })
+            .then( authordata => { 
+                if(authordata.length >= 1) { //if author exists, get author id to create book
+                    author_id = authordata[0].author_id
+                    return;
+                } else { //if author does not exist, create author
+                    author_id = uuidv4()
+                    return Author.create({
+                        author_id: author_id,
+                        firstName: firstName,
+                        lastName: lastName,
+                        middleName: middleName,
+                        email: email
+                    })
+                }
+            })
+            .then((resolve) => { //if author exists or not create book except book exist already
                 Book.create({
                     book_id: book_id,
                     author_id: author_id,
@@ -138,25 +169,24 @@ const uploadBook =(req,res)=>{
                     rating: rating
                 })
             })
-            .then((resolve)=>{
-                res.send('Book upload successful')
-            }).catch((error)=>{
+            .then((resolve) => {
+                res.status(200).send({
+                    status: true,
+                    message: `Book titled: '${title}' uploaded successful`
+                })
+            }).catch((err)=>{
                 res.status(400).json({
                     status: false,
-                    message: error.message || "Some error occurred"
+                    message: err.message
                 })
             })
-                
-                 
-        
-    } catch (error) {
-        res.status(400).json({
-            status: false,
-            message: error.message || "Some error occurred"
-        })
-        
+        } catch (error) {
+            res.status(400).json({
+                status: false,
+                message: error.message || "Some error occurred"
+            })
+        }
     }
-}
 }
 
 const deleteBook=((req,res)=>{
@@ -178,8 +208,8 @@ const deleteBook=((req,res)=>{
         res.status(400).json({
             status: false,
             message: error.message || "Some error occurred"
-    })
-   } 
+        })
+    } 
 })
 
 const updateBook = async (req, res) => {
